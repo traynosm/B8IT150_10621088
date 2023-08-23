@@ -124,17 +124,17 @@ namespace core_strength_yoga_products_api.Controllers
                _context.ProductCategories.Attach(product.ProductCategory);
             }
 
-            if (product.ImageId > 0)
+            if (product.Image.Id > 0)
             {
                 _context.Images.Attach(product.Image);
             }
-            else
-            {
-                Image image = new Image();
-                image.ImageName = product.Image.ImageName;
-                image.Alt = product.Image.Alt;
-                image.Path = product.Image.Path;
-            }
+            //else
+            //{
+            //    Image image = new Image();
+            //    image.ImageName = product.Image.ImageName;
+            //    image.Alt = product.Image.Alt;
+            //    image.Path = product.Image.Path;
+            //}
 
             foreach (var productAttribute in product.ProductAttributes)
             {
