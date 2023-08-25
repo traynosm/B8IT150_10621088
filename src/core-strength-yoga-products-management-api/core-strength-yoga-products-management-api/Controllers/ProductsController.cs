@@ -214,20 +214,20 @@ namespace core_strength_yoga_products_api.Controllers
         }
 
         [Microsoft.AspNetCore.Authorization.Authorize]
-        [Microsoft.AspNetCore.Mvc.HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [Microsoft.AspNetCore.Mvc.HttpGet("Delete/{productId}")]
+        public async Task<IActionResult> Delete(int productid)
         {
             if (_context.Products == null)
             {
                 return NotFound();
             }
-            var movie = await _context.Products.FindAsync(id);
-            if (movie == null)
+            var product = await _context.Products.FindAsync(productid);
+            if (product == null)
             {
                 return NotFound();
             }
 
-            _context.Products.Remove(movie);
+            _context.Products.Remove(product);
             await _context.SaveChangesAsync();
 
             return NoContent();
