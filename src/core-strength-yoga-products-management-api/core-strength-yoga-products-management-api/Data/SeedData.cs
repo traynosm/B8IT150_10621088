@@ -980,14 +980,12 @@ namespace core_strength_yoga_products_api.Data
         }
         
         private static IEnumerable<IdentityUser> SeedUsers()
-        {
-            
+        {        
             var passwordHasher = new PasswordHasher<object>();
             var hashedPassword = passwordHasher.HashPassword(null, "Testing123!");
             
             return new List<IdentityUser>
-            {
-                
+            {           
                 new IdentityUser()
                 {
                     Email = "admin@email.com",
@@ -1000,6 +998,13 @@ namespace core_strength_yoga_products_api.Data
                     Email = "user@email.com",
                     SecurityStamp = Guid.NewGuid().ToString(),
                     UserName = "user",
+                    PasswordHash = hashedPassword
+                },
+                new IdentityUser()
+                {
+                    Email = "trayno@gmail.com",
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    UserName = "trayno",
                     PasswordHash = hashedPassword
                 }
             };

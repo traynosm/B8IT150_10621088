@@ -1,15 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using core_strength_yoga_products_api.Data.Contexts;
+﻿using core_strength_yoga_products_api.Data.Contexts;
 using core_strength_yoga_products_api.DTO;
 using core_strength_yoga_products_api.Models;
 using core_strength_yoga_products_api.Models.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 
 namespace core_strength_yoga_products_api.Controllers
@@ -17,8 +16,7 @@ namespace core_strength_yoga_products_api.Controllers
     [Microsoft.AspNetCore.Mvc.Route("api/v1/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
-    {
-        
+    {   
         private readonly ILogger<AuthController> _logger;
         private readonly CoreStrengthYogaProductsApiDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
@@ -37,9 +35,9 @@ namespace core_strength_yoga_products_api.Controllers
         }
         
        
-       [Microsoft.AspNetCore.Mvc.HttpPost]
-        [Microsoft.AspNetCore.Mvc.Route("login")]
-        public async Task<IActionResult> Login([Microsoft.AspNetCore.Mvc.FromBody] LoginDTO model)
+        [HttpPost]
+        [Route("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDTO model)
         {
             var user = await _userManager.FindByEmailAsync(model.Username);
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
@@ -69,9 +67,9 @@ namespace core_strength_yoga_products_api.Controllers
             return Unauthorized();
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpPost]
-        [Microsoft.AspNetCore.Mvc.Route("register")]
-        public async Task<IActionResult> Register([Microsoft.AspNetCore.Mvc.FromBody] CustomerDTO model)
+        [HttpPost]
+        [Route("register")]
+        public async Task<IActionResult> Register([FromBody] CustomerDTO model)
         {
             var userExists = await _userManager.FindByEmailAsync(model.CustomerDetail.Email);
             if (userExists != null)
@@ -89,19 +87,19 @@ namespace core_strength_yoga_products_api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     new ResponseDTO()
                     {
-                        Status = "Error", Message = "User creation failed! Please check user details and try again."
+                        Status = "Error",
+                        Message = "User creation failed! Please check user details and try again."
                     });
-            
+
             if (!await _roleManager.RoleExistsAsync(UserRoles.Admin))
                 await _roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
             if (!await _roleManager.RoleExistsAsync(UserRoles.User))
                 await _roleManager.CreateAsync(new IdentityRole(UserRoles.User));
-            
+
             if (await _roleManager.RoleExistsAsync(UserRoles.User))
             {
                 await _userManager.AddToRoleAsync(user, UserRoles.User);
             }
-
 
             CustomerDetail customerDetail = new()
             {
@@ -123,35 +121,34 @@ namespace core_strength_yoga_products_api.Controllers
             _context.Customers.Add(customer);
             _context.SaveChanges();
 
-            
-                var userRoles = await _userManager.GetRolesAsync(user);
-                var userJson = JsonConvert.SerializeObject(user);
 
-                var authClaims = new List<Claim>
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var userJson = JsonConvert.SerializeObject(user);
+
+            var authClaims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, user.UserName),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
 
-                foreach (var userRole in userRoles)
-                {
-                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-                }
+            foreach (var userRole in userRoles)
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+            }
 
-                var token = GetToken(authClaims);
+            var token = GetToken(authClaims);
 
-                return Ok(new
-                {
-                    token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo
-                });
-            
+            return Ok(new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                expiration = token.ValidTo
+            });
 
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpPost]
-        [Microsoft.AspNetCore.Mvc.Route("register-admin")]
+        [HttpPost]
+        [Route("register-admin")]
         public async Task<IActionResult> RegisterAdmin([Microsoft.AspNetCore.Mvc.FromBody] CustomerDTO model)
         {
             var userExists = await _userManager.FindByEmailAsync(model.CustomerDetail.Email);
@@ -189,29 +186,17 @@ namespace core_strength_yoga_products_api.Controllers
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
             var credentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256);
 
-
             var token = new JwtSecurityToken(
                 issuer: _configuration["JWT:ValidIssuer"],
                 audience: _configuration["JWT:ValidAudience"],
                 expires: DateTime.Now.AddHours(3),
                 claims: authClaims,
-                signingCredentials: credentials
-                );
+                signingCredentials: credentials);
 
             return token;
         }
-
-
-        [Authorize, Microsoft.AspNetCore.Mvc.HttpGet, Microsoft.AspNetCore.Mvc.Route("dummy")]
-        public async Task<IActionResult> Dummy()
-        {
-            
-            return Ok(new ResponseDTO() { Status = "Success", Message = "User created successfully!" });
-        }
-    }
-    
-       
-    }
+    }     
+}
     
     
     
