@@ -33,6 +33,7 @@ namespace core_strength_yoga_products_api
                     options.Password.RequireNonAlphanumeric = false;
                     options.Password.RequireUppercase = false;
                 })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<CoreStrengthYogaProductsApiDbContext>()
                 .AddDefaultTokenProviders();
             
@@ -109,8 +110,6 @@ namespace core_strength_yoga_products_api
             builder.Services.AddDbContext<CoreStrengthYogaProductsApiDbContext>(options =>
                 options.UseSqlite(connectionString));
             
-           
-
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())
