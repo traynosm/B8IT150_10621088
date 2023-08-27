@@ -990,21 +990,28 @@ namespace core_strength_yoga_products_api.Data
                 {
                     Email = "admin@email.com",
                     SecurityStamp = Guid.NewGuid().ToString(),
-                    UserName = "admin",
+                    UserName = "admin@email.com",
                     PasswordHash = hashedPassword
                 },
                 new IdentityUser()
                 {
-                    Email = "user@email.com",
+                    Email = "productexecutive@email.com",
                     SecurityStamp = Guid.NewGuid().ToString(),
-                    UserName = "user",
+                    UserName = "productexecutive@email.com",
                     PasswordHash = hashedPassword
                 },
                 new IdentityUser()
                 {
-                    Email = "trayno@gmail.com",
+                    Email = "productmanager@email.com",
                     SecurityStamp = Guid.NewGuid().ToString(),
-                    UserName = "trayno",
+                    UserName = "productmanager@email.com",
+                    PasswordHash = hashedPassword
+                },
+                new IdentityUser()
+                {
+                    Email = "businessanalyst@email.com",
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    UserName = "businessanalyst@email.com",
                     PasswordHash = hashedPassword
                 }
             };
@@ -1013,16 +1020,26 @@ namespace core_strength_yoga_products_api.Data
         public static async Task SeedRoles()
         {
             // Create the "Admin" role if it doesn't exist
-            if (!await _roleManager.RoleExistsAsync("Admin"))
+            if (!await _roleManager.RoleExistsAsync(UserRoles.Admin))
             {
-                var adminRole = new IdentityRole("Admin");
+                var adminRole = new IdentityRole(UserRoles.Admin);
                 await _roleManager.CreateAsync(adminRole);
             }
 
             // Create the "User" role if it doesn't exist
-            if (!await _roleManager.RoleExistsAsync("User"))
+            if (!await _roleManager.RoleExistsAsync(UserRoles.ProductExecutive))
             {
-                var userRole = new IdentityRole("User");
+                var userRole = new IdentityRole(UserRoles.ProductExecutive);
+                await _roleManager.CreateAsync(userRole);
+            }
+            if (!await _roleManager.RoleExistsAsync(UserRoles.ProductManager))
+            {
+                var userRole = new IdentityRole(UserRoles.ProductManager);
+                await _roleManager.CreateAsync(userRole);
+            }
+            if (!await _roleManager.RoleExistsAsync(UserRoles.BusinessAnalyst))
+            {
+                var userRole = new IdentityRole(UserRoles.BusinessAnalyst);
                 await _roleManager.CreateAsync(userRole);
             }
         }
@@ -1038,13 +1055,21 @@ namespace core_strength_yoga_products_api.Data
                 {
                     // User created successfully
 
-                    if (user.UserName == "admin")
+                    if (user.UserName == "admin@email.com")
                     {
-                        await _userManager.AddToRolesAsync(user, new[] { "User", "Admin" });
+                        await _userManager.AddToRolesAsync(user, new[] { UserRoles.Admin });
                     }
-                    else
+                    if (user.UserName == "productexecutive@email.com")
                     {
-                        await _userManager.AddToRolesAsync(user, new[] { "User" });  
+                        await _userManager.AddToRolesAsync(user, new[] { UserRoles.ProductExecutive});
+                    }
+                    if (user.UserName == "productmanager@email.com")
+                    {
+                        await _userManager.AddToRolesAsync(user, new[] { UserRoles.ProductManager});
+                    }
+                    if (user.UserName == "businessanalyst@email.com")
+                    {
+                        await _userManager.AddToRolesAsync(user, new[] { UserRoles.BusinessAnalyst });  
                     }
                     
                     // Add roles to the user

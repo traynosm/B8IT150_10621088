@@ -3,5 +3,7 @@
 public static class UserRoles
 {
     public const string Admin = "Admin";
-    public const string User = "User";
+    public const string ProductExecutive = "ProductExecutive";
+    public const string ProductManager = "ProductManager";
+    public const string BusinessAnalyst = "BusinessAnalyst";
 }
