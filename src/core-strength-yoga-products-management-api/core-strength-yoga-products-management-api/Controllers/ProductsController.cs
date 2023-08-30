@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Web.Http;
 using core_strength_yoga_products_api.Model;
 using Microsoft.AspNetCore.Authorization;
+using core_strength_yoga_products_api.Interfaces;
+using System.Diagnostics.Eventing.Reader;
 
 namespace core_strength_yoga_products_api.Controllers
 {
@@ -15,11 +17,15 @@ namespace core_strength_yoga_products_api.Controllers
     {
         private readonly ILogger<ProductsController> _logger;
         private readonly CoreStrengthYogaProductsApiDbContext _context;
+        private readonly IStockAuditService _stockAuditService;
 
-        public ProductsController(ILogger<ProductsController> logger, CoreStrengthYogaProductsApiDbContext context)
+        public ProductsController(ILogger<ProductsController> logger, 
+            CoreStrengthYogaProductsApiDbContext context,
+            IStockAuditService stockAuditService)
         {
             _logger = logger;
             _context = context;
+            _stockAuditService = stockAuditService;
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet("{id}")]
@@ -180,7 +186,7 @@ namespace core_strength_yoga_products_api.Controllers
                 RedirectToAction("Post", new { productToUpdate });
             }
 
-            UpdateProductAttributes(productToUpdate, savedProduct!);
+            await UpdateProductAttributes(productToUpdate, savedProduct!);
             productToUpdate = UpdateProductCategory(productToUpdate, savedProduct!);
             productToUpdate = UpdateProductType(productToUpdate, savedProduct!);
             productToUpdate = UpdateImage(productToUpdate, savedProduct!);
@@ -226,7 +232,7 @@ namespace core_strength_yoga_products_api.Controllers
             return NoContent();
         }
 
-        private void UpdateProductAttributes(Product productToUpdate, Product savedProduct)
+        private async Task UpdateProductAttributes(Product productToUpdate, Product savedProduct)
         {
             foreach (var productAttributeToUpdate in productToUpdate.ProductAttributes)
             {
@@ -237,7 +243,23 @@ namespace core_strength_yoga_products_api.Controllers
                 
                 var savedProductAttribute = savedProduct.ProductAttributes.SingleOrDefault(
                     pa => pa.Id == productAttributeToUpdate.Id);
+                if (productAttributeToUpdate.StockLevel != savedProductAttribute.StockLevel)
+                {
+                    var oldStockLevel = savedProductAttribute.StockLevel;
+                    var newStockLevel = productAttributeToUpdate.StockLevel;
 
+                    var stockAudit = new StockAudit()
+                    {
+                        ChangedAt = DateTime.Now,
+                        ProductId = savedProduct.Id,
+                        ProductAttributeId = productAttributeToUpdate.ProductId,
+                        Username = "TBC",
+                        OldStockLevel = oldStockLevel,
+                        NewStockLevel = newStockLevel,
+                        StockLevelChange = StockAudit.CalculateStockChange(newStockLevel, oldStockLevel)
+                    };
+                    await _stockAuditService.SaveStockAudit(stockAudit);
+                }
                 if (savedProductAttribute != null)
                 {
                     _context.Entry(savedProductAttribute).CurrentValues.SetValues(productAttributeToUpdate);

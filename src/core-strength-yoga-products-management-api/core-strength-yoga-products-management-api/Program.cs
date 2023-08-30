@@ -7,7 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
-
+using core_strength_yoga_products_api.Interfaces;
+using core_strength_yoga_products_api.Services;
+using core_strength_yoga_products_api.Controllers;
 
 namespace core_strength_yoga_products_api
 {
@@ -109,6 +111,10 @@ namespace core_strength_yoga_products_api
 
             builder.Services.AddDbContext<CoreStrengthYogaProductsApiDbContext>(options =>
                 options.UseSqlite(connectionString));
+
+            builder.Services.AddTransient<IStockAuditService, StockAuditService>();
+            builder.Services.AddScoped<IDataGenerator, DataGenerator>();
+            builder.Services.AddScoped<ProductsController>();
             
             var app = builder.Build();
 
@@ -120,7 +126,14 @@ namespace core_strength_yoga_products_api
                 SeedData.Initialize(services);
             }
 
-            // Configure the HTTP request pipeline.
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var dataGenerator = services.GetRequiredService<IDataGenerator>();
+                dataGenerator.Generate(-3);
+            }
+
+                // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();

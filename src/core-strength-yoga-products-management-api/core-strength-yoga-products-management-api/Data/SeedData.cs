@@ -18,9 +18,9 @@ namespace core_strength_yoga_products_api.Data
         private static IEnumerable<CustomerDetail> _customerDetails;
         private static IEnumerable<AddressDetail> _addressDetails;
         private static IEnumerable<Order> _orders;
+        private static IEnumerable<StockAudit> _stockAudit;
         private static RoleManager<IdentityRole> _roleManager;
         private static UserManager<IdentityUser> _userManager;
-
 
         public static void Initialize(IServiceProvider serviceProvider)
         {
@@ -33,6 +33,7 @@ namespace core_strength_yoga_products_api.Data
             _customers = SeedCustomers();
             _users = SeedUsers();
             _orders = SeedOrders();
+            _stockAudit = SeedStockAudit();
             _userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
             _roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             SeedRoles();
@@ -54,7 +55,8 @@ namespace core_strength_yoga_products_api.Data
                     "DELETE FROM [Customers];" +
                     "DELETE FROM [BasketItem];" +
                     "DELETE FROM [AspNetUsers];" +
-                    "DELETE FROM [Orders];");
+                    "DELETE FROM [Orders];" +
+                    "DELETE FROM [StockAudits];");
 
                 if (context.Products.Any())
                 {
@@ -100,6 +102,17 @@ namespace core_strength_yoga_products_api.Data
                         context.Orders.Add(order);
                     }
                 }
+                if(context.StockAudits.Any())
+                {
+                    Console.WriteLine("The Stock Audit database contains data and cannot be seeded");
+                }
+                else
+                {
+                    foreach (var stockaudit in _stockAudit)
+                    {
+                        context.StockAudits.Add(stockaudit);
+                    }
+                }
 
                 context.SaveChanges();
             }
@@ -121,21 +134,21 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 1,
-                            stockLevel: 10,
+                            stockLevel: 100,
                             priceAdjustment: 0,
                             colour: Colour.Red,
                             size: Size.M,
                             gender: Gender.Unisex),
                         new ProductAttributes(
                             id: 2,
-                            stockLevel: 15,
+                            stockLevel: 100,
                             priceAdjustment: 0,
                             colour: Colour.Blue,
                             size: Size.M,
                             gender: Gender.Unisex),
                         new ProductAttributes(
                             id: 3,
-                            stockLevel: 15,
+                            stockLevel: 100,
                             priceAdjustment: 0,
                             colour: Colour.Green,
                             size: Size.M,
@@ -154,7 +167,7 @@ namespace core_strength_yoga_products_api.Data
                         new ProductAttributes(
                             id: 4,
                             stockLevel: 100,
-                            priceAdjustment: -0.5m,
+                            priceAdjustment: 0.5m,
                             colour: Colour.Red,
                             size: Size.M,
                             gender: Gender.Unisex),
@@ -172,7 +185,7 @@ namespace core_strength_yoga_products_api.Data
                         new ProductAttributes(
                             id: 5,
                             stockLevel: 100,
-                            priceAdjustment: -0.5m,
+                            priceAdjustment: 0.5m,
                             colour: Colour.Purple,
                             size: Size.M,
                             gender: Gender.Unisex),
@@ -190,14 +203,14 @@ namespace core_strength_yoga_products_api.Data
                         new ProductAttributes(
                             id: 6,
                             stockLevel: 100,
-                            priceAdjustment: -0.5m,
+                            priceAdjustment: 0.5m,
                             colour: Colour.Red,
                             size: Size.M,
                             gender: Gender.Unisex),
                         new ProductAttributes(
                             id: 7,
                             stockLevel: 10,
-                            priceAdjustment: -0.5m,
+                            priceAdjustment: 0.5m,
                             colour: Colour.Green,
                             size: Size.M,
                             gender: Gender.Unisex),
@@ -215,7 +228,7 @@ namespace core_strength_yoga_products_api.Data
                         new ProductAttributes(
                             id: 8,
                             stockLevel: 100,
-                            priceAdjustment: -0.5m,
+                            priceAdjustment: 0.5m,
                             colour: Colour.Red,
                             size: Size.M,
                             gender: Gender.Womens),
@@ -229,7 +242,7 @@ namespace core_strength_yoga_products_api.Data
                         new ProductAttributes(
                             id: 10,
                             stockLevel: 100,
-                            priceAdjustment: -0.10m,
+                            priceAdjustment: 0.10m,
                             colour: Colour.Purple,
                             size: Size.M,
                             gender: Gender.Womens),
@@ -246,14 +259,14 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 11,
-                            stockLevel: 30,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.Blue,
                             size: Size.M,
                             gender: Gender.Mens),
                         new ProductAttributes(
                             id: 12,
-                            stockLevel: 30,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.Black,
                             size: Size.M,
@@ -271,14 +284,14 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 13,
-                            stockLevel: 30,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.Blue,
                             size: Size.M,
                             gender: Gender.Mens),
                         new ProductAttributes(
                             id: 14,
-                            stockLevel: 30,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.Black,
                             size: Size.M,
@@ -296,21 +309,21 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 15,
-                            stockLevel: 30,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.White,
                             size: Size.M,
                             gender: Gender.Womens),
                         new ProductAttributes(
                             id: 16,
-                            stockLevel: 30,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.Purple,
                             size: Size.L,
                             gender: Gender.Womens),
                         new ProductAttributes(
                             id: 17,
-                            stockLevel: 30,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.Red,
                             size: Size.XL,
@@ -328,14 +341,14 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 18,
-                            stockLevel: 30,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.White,
                             size: Size.M,
                             gender: Gender.Womens),
                         new ProductAttributes(
                             id: 19,
-                            stockLevel: 30,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.Purple,
                             size: Size.L,
@@ -360,21 +373,21 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 21,
-                            stockLevel: 30,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.White,
                             size: Size.M,
                             gender: Gender.Womens),
                         new ProductAttributes(
                             id: 22,
-                            stockLevel: 30,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.Yellow,
                             size: Size.L,
                             gender: Gender.Womens),
                         new ProductAttributes(
                             id: 23,
-                            stockLevel: 30,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.Orange,
                             size: Size.XL,
@@ -393,14 +406,14 @@ namespace core_strength_yoga_products_api.Data
                         new ProductAttributes(
                             id: 24,
                             stockLevel: 100,
-                            priceAdjustment: -0.5m,
+                            priceAdjustment: 0.5m,
                             colour: Colour.Red,
                             size: Size.M,
                             gender: Gender.Unisex),
                         new ProductAttributes(
                             id: 25,
-                            stockLevel: 10,
-                            priceAdjustment: -0.5m,
+                            stockLevel: 100,
+                            priceAdjustment: 0.5m,
                             colour: Colour.Green,
                             size: Size.M,
                             gender: Gender.Unisex),
@@ -417,21 +430,21 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 26,
-                            stockLevel: 10,
+                            stockLevel: 100,
                             priceAdjustment: 0,
                             colour: Colour.Red,
                             size: Size.M,
                             gender: Gender.Unisex),
                         new ProductAttributes(
                             id: 27,
-                            stockLevel: 15,
+                            stockLevel: 100,
                             priceAdjustment: 0,
                             colour: Colour.Blue,
                             size: Size.M,
                             gender: Gender.Unisex),
                         new ProductAttributes(
                             id: 28,
-                            stockLevel: 15,
+                            stockLevel: 100,
                             priceAdjustment: 0,
                             colour: Colour.Green,
                             size: Size.M,
@@ -449,7 +462,7 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 29,
-                            stockLevel: 10,
+                            stockLevel: 100,
                             priceAdjustment: 0,
                             colour: Colour.Black,
                             size: Size.M,
@@ -467,14 +480,14 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 30,
-                            stockLevel: 5,
+                            stockLevel: 100,
                             priceAdjustment: 0,
                             colour: Colour.Pink,
                             size: Size.M,
                             gender: Gender.Unisex),
                         new ProductAttributes(
                             id: 31,
-                            stockLevel: 10,
+                            stockLevel: 100,
                             priceAdjustment: 0,
                             colour: Colour.Blue,
                             size: Size.M,
@@ -492,14 +505,14 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 32,
-                            stockLevel: 15,
-                            priceAdjustment: -0.5m,
+                            stockLevel: 100,
+                            priceAdjustment: 0.5m,
                             colour: Colour.Black,
                             size: Size.M,
                             gender: Gender.Unisex),
                         new ProductAttributes(
                             id: 33,
-                            stockLevel: 10,
+                            stockLevel: 100,
                             priceAdjustment: 0,
                             colour: Colour.Green,
                             size: Size.M,
@@ -517,14 +530,14 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 34,
-                            stockLevel: 15,
-                            priceAdjustment: -0.5m,
+                            stockLevel: 100,
+                            priceAdjustment: 0.5m,
                             colour: Colour.Black,
                             size: Size.M,
                             gender: Gender.Unisex),
                         new ProductAttributes(
                             id: 35,
-                            stockLevel: 10,
+                            stockLevel: 100,
                             priceAdjustment: 0,
                             colour: Colour.Purple,
                             size: Size.M,
@@ -542,14 +555,14 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 36,
-                            stockLevel: 15,
-                            priceAdjustment: -0.5m,
+                            stockLevel: 100,
+                            priceAdjustment: 0.5m,
                             colour: Colour.Black,
                             size: Size.M,
                             gender: Gender.Unisex),
                         new ProductAttributes(
                             id: 37,
-                            stockLevel: 10,
+                            stockLevel: 100,
                             priceAdjustment: 0,
                             colour: Colour.Purple,
                             size: Size.M,
@@ -567,14 +580,14 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 38,
-                            stockLevel: 15,
-                            priceAdjustment: -0.5m,
+                            stockLevel: 100,
+                            priceAdjustment: 0.5m,
                             colour: Colour.Black,
                             size: Size.M,
                             gender: Gender.Unisex),
                         new ProductAttributes(
                             id: 39,
-                            stockLevel: 10,
+                            stockLevel: 100,
                             priceAdjustment: 0,
                             colour: Colour.Black,
                             size: Size.L,
@@ -592,15 +605,15 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 40,
-                            stockLevel: 30,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.Blue,
                             size: Size.M,
                             gender: Gender.Mens),
                         new ProductAttributes(
                             id: 41,
-                            stockLevel: 30,
-                            priceAdjustment: -0.6m,
+                            stockLevel: 100,
+                            priceAdjustment: 0.6m,
                             colour: Colour.Black,
                             size: Size.XL,
                             gender: Gender.Mens),
@@ -617,7 +630,7 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 42,
-                            stockLevel: 15,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.Black,
                             size: Size.M,
@@ -635,7 +648,7 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 43,
-                            stockLevel: 20,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.Yellow,
                             size: Size.M,
@@ -653,7 +666,7 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 44,
-                            stockLevel: 30,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.Blue,
                             size: Size.M,
@@ -671,7 +684,7 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 45,
-                            stockLevel: 10,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.Black,
                             size: Size.M,
@@ -689,7 +702,7 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 46,
-                            stockLevel: 30,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.Blue,
                             size: Size.M,
@@ -707,7 +720,7 @@ namespace core_strength_yoga_products_api.Data
                     {
                         new ProductAttributes(
                             id: 47,
-                            stockLevel: 20,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.Green,
                             size: Size.M,
@@ -1163,7 +1176,85 @@ namespace core_strength_yoga_products_api.Data
                             TotalCost = 35.50m,
                         }
                     }
+                },
+                new Order
+                {
+                    Id=2,
+                    CustomerId = 1,
+                    ShippingAddressId = 1,
+                    DateOfSale= new DateTime(2022, 10, 02),
+                    IsPaid = true,
+                    OrderTotal = 28.50m,
+                    Items = new List<BasketItem>
+                    {
+                        new BasketItem
+                        {
+                            CustomerId= 1,
+                            ProductId = 2,
+                            ProductAttributeId = 4,
+                            Quantity = 3,
+                            TotalCost = 28.50m,
+                        }
+                    }
+
+                },
+                new Order
+                {
+                    Id=3,
+                    CustomerId = 1,
+                    ShippingAddressId = 1,
+                    DateOfSale= new DateTime(2023, 04, 30),
+                    IsPaid = true,
+                    OrderTotal = 19.40m,
+                    Items = new List<BasketItem>
+                    {
+                        new BasketItem
+                        {
+                            CustomerId= 1,
+                            ProductId = 19,
+                            ProductAttributeId = 40,
+                            Quantity= 1,
+                            TotalCost = 10.00m,
+                        },
+                        new BasketItem
+                        {
+                            CustomerId= 1,
+                            ProductId = 19,
+                            ProductAttributeId = 41,
+                            Quantity= 1,
+                            TotalCost = 9.40m,
+                        }
+                    }
                 }
+            };
+        }
+        private static IEnumerable<StockAudit> SeedStockAudit()
+        {
+            return new List<StockAudit>
+            {
+                new StockAudit
+                {
+                   Id = 1,
+                   ChangedAt = new DateTime(2023, 05, 10, 10, 00, 00),
+                   ProductId = 7,
+                   ProductAttributeId = 14,
+                   Username = "Customer",
+                   OldStockLevel = 100,
+                   NewStockLevel = 25,
+                   StockLevelChange = -75,
+                   OrderId = 1,
+                },
+                new StockAudit
+                {
+                   Id = 2,
+                   ChangedAt = new DateTime(2023, 05, 10, 10, 05, 00),
+                   ProductId = 8,
+                   ProductAttributeId = 16,
+                   Username = "ProductExecutive",
+                   OldStockLevel = 40,
+                   NewStockLevel = 100,
+                   StockLevelChange = 60,
+                },
             };
         }
 
