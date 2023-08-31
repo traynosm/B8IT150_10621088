@@ -46,12 +46,13 @@ namespace core_strength_yoga_products_api.Controllers
         //}
 
         [Microsoft.AspNetCore.Mvc.HttpGet(
-            "SearchByUsername" +
+            "FilterReport" +
             "/Username={username}" +
             "/StartDateTime={startDateTime}" +
             "/EndDateTime={endDateTime}")]
-        public async Task<ActionResult<IEnumerable<StockAudit>>> SearchByUsername(
-            string username, string startDateTime, string endDateTime)
+        public async Task<ActionResult<IEnumerable<StockAudit>>> FilterReport(
+            string username, 
+            string startDateTime, string endDateTime)
         {
             var start = DateTime.Parse(startDateTime);
             var end = DateTime.Parse(endDateTime);
@@ -64,6 +65,19 @@ namespace core_strength_yoga_products_api.Controllers
 
             return stockAudits.ToList();
         }
+        //public static List<Product> SelectOnProductType(this List<StockAudit> stockAudits, DbSet<StockAudit> set, int id)
+        //{
+        //    var ids = stockAudits
+        //         .Where(p => p.ProductId == id)
+        //         .Select(p => p.Id)
+        //         .ToList();
+
+        //    return id > 0 && stockAudits.Any() ? set
+        //     .IncludeAllRelated()
+        //     .Where(p => ids.Contains(p.Id))
+        //         .ToList() :
+        //     stockAudits;
+        //}
 
         //[Microsoft.AspNetCore.Mvc.HttpGet("SearchByDatrange/{dateTime}")]
 
