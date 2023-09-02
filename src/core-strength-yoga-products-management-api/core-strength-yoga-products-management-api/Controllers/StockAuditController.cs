@@ -48,55 +48,53 @@ namespace core_strength_yoga_products_api.Controllers
 
         [Microsoft.AspNetCore.Mvc.HttpGet(
             "FilterReport" +
-            "/Username={username}" +
             "/StartDateTime={startDateTime}" +
             "/EndDateTime={endDateTime}" +
-            "/ProductTypeId={productTypeId}")]
+            "/ProductId={productId}" +
+            "/ProductTypeId={productTypeId}" +
+            "/Username={username}")]
         public async Task<ActionResult<IEnumerable<StockAudit>>> FilterReport(
-            string startDateTime, string endDateTime, int productTypeId, string username)
+            string startDateTime, string endDateTime, int productId, int productTypeId, string username)
         {
             var start = DateTime.Parse(startDateTime);
             var end = DateTime.Parse(endDateTime);
             var usern = "";
-            var prodTypeId = 0;
-            var productsByTypeId = _context.Products.SelectOnType(productTypeId);
-
-            var productIds = productsByTypeId.Select(p => p.Id).ToList();
-
-            var stockAuditsByProductTypeId = _context.StockAudits
-                .Where(s => productIds.Contains(s.ProductId));
-
+            var stockAudits = new List<StockAudit>();
 
             if (username != "unknown")
             {
                 usern = username.Replace("%20", " ");
             }
-            if (productTypeId != 0 )
-            {
-                prodTypeId = productTypeId;
-            }
 
-            var stockAudits = new List<StockAudit>();
-            if (string.IsNullOrEmpty(usern) && prodTypeId == 0) 
-            {
-                stockAudits = _context.StockAudits.
-                    Where(p => p.ChangedAt >= start && p.ChangedAt <= end).ToList();
-            }
-            else if (string.IsNullOrEmpty(usern) && prodTypeId > 0)
-            {
-                stockAudits = stockAuditsByProductTypeId
-                    .Where(p => p.ChangedAt >= start && p.ChangedAt <= end).ToList();
-            }
-            else if (!string.IsNullOrEmpty(usern) && productTypeId == 0) 
+            if (productId > 0)
             {
                 stockAudits = _context.StockAudits
-                    .Where(p => p.Username == usern && p.ChangedAt >= start && p.ChangedAt <= end).ToList();
+                    .Where(s => s.ProductId == productId).ToList();
             }
-            else if (!string.IsNullOrEmpty(usern) && prodTypeId > 0)
+            else if (productId == 0 && productTypeId > 0)
             {
-                stockAudits = stockAuditsByProductTypeId
+                var productsByTypeId = _context.Products.SelectOnType(productTypeId);
+                var productIdsForProductTypeId = productsByTypeId.Select(p => p.Id).ToList();
+                stockAudits = _context.StockAudits
+                    .Where(s => productIdsForProductTypeId.Contains(s.ProductId)).ToList();
+            }
+            else
+            {
+                stockAudits = _context.StockAudits.ToList();
+            }
+
+            if (!string.IsNullOrEmpty(usern))
+            {
+                stockAudits = stockAudits
                     .Where(p => p.Username == usern && p.ChangedAt >= start && p.ChangedAt <= end).ToList();
             }
+            else
+            {
+                stockAudits = stockAudits
+                    .Where(p => p.ChangedAt >= start && p.ChangedAt <= end).ToList();
+
+            }
+
             if (stockAudits == null) return NotFound();
 
             return stockAudits.ToList();

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using core_strength_yoga_products_api.Data.Contexts;
 
@@ -10,9 +11,11 @@ using core_strength_yoga_products_api.Data.Contexts;
 namespace core_strength_yoga_products_api.Migrations
 {
     [DbContext(typeof(CoreStrengthYogaProductsApiDbContext))]
-    partial class CoreStrengthYogaProductsApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230830101509_stockaudit")]
+    partial class stockaudit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
@@ -275,6 +278,9 @@ namespace core_strength_yoga_products_api.Migrations
                     b.Property<int>("ProductAttributeId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("ProductAttributesId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("INTEGER");
 
@@ -286,6 +292,12 @@ namespace core_strength_yoga_products_api.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductAttributesId");
+
+                    b.HasIndex("ProductId");
 
                     b.ToTable("StockAudits");
                 });
@@ -591,6 +603,31 @@ namespace core_strength_yoga_products_api.Migrations
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("core_strength_yoga_products_api.Model.StockAudit", b =>
+                {
+                    b.HasOne("core_strength_yoga_products_api.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId");
+
+                    b.HasOne("core_strength_yoga_products_api.Models.ProductAttributes", "ProductAttributes")
+                        .WithMany()
+                        .HasForeignKey("ProductAttributesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("core_strength_yoga_products_api.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("ProductAttributes");
                 });
 
             modelBuilder.Entity("core_strength_yoga_products_api.Models.AddressDetail", b =>
