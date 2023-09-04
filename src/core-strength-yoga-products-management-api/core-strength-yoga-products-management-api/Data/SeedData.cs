@@ -33,7 +33,7 @@ namespace core_strength_yoga_products_api.Data
             _customers = SeedCustomers();
             _users = SeedUsers();
             _orders = SeedOrders();
-            _stockAudit = SeedStockAudit();
+            //_stockAudit = SeedStockAudit();
             _userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
             _roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             SeedRoles();
@@ -102,17 +102,17 @@ namespace core_strength_yoga_products_api.Data
                         context.Orders.Add(order);
                     }
                 }
-                if(context.StockAudits.Any())
-                {
-                    Console.WriteLine("The Stock Audit database contains data and cannot be seeded");
-                }
-                else
-                {
-                    foreach (var stockaudit in _stockAudit)
-                    {
-                        context.StockAudits.Add(stockaudit);
-                    }
-                }
+                //if(context.StockAudits.Any())
+                //{
+                //    Console.WriteLine("The Stock Audit database contains data and cannot be seeded");
+                //}
+                //else
+                //{
+                //    foreach (var stockaudit in _stockAudit)
+                //    {
+                //        context.StockAudits.Add(stockaudit);
+                //    }
+                //}
 
                 context.SaveChanges();
             }
@@ -209,7 +209,7 @@ namespace core_strength_yoga_products_api.Data
                             gender: Gender.Unisex),
                         new ProductAttributes(
                             id: 7,
-                            stockLevel: 10,
+                            stockLevel: 100,
                             priceAdjustment: 0.5m,
                             colour: Colour.Green,
                             size: Size.M,
@@ -355,7 +355,7 @@ namespace core_strength_yoga_products_api.Data
                             gender: Gender.Womens),
                         new ProductAttributes(
                             id: 20,
-                            stockLevel: 30,
+                            stockLevel: 100,
                             priceAdjustment: 0m,
                             colour: Colour.Red,
                             size: Size.XL,

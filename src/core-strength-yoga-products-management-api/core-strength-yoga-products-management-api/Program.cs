@@ -10,6 +10,8 @@ using Microsoft.OpenApi.Models;
 using core_strength_yoga_products_api.Interfaces;
 using core_strength_yoga_products_api.Services;
 using core_strength_yoga_products_api.Controllers;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace core_strength_yoga_products_api
 {
@@ -115,7 +117,10 @@ namespace core_strength_yoga_products_api
             builder.Services.AddTransient<IStockAuditService, StockAuditService>();
             builder.Services.AddScoped<IDataGenerator, DataGenerator>();
             builder.Services.AddScoped<ProductsController>();
-            
+
+            builder.Services.Configure<DataGenerationSettings>(o =>
+                builder.Configuration.GetSection("DataGenerationSettings").Bind(o));
+
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())
@@ -130,10 +135,11 @@ namespace core_strength_yoga_products_api
             {
                 var services = scope.ServiceProvider;
                 var dataGenerator = services.GetRequiredService<IDataGenerator>();
-                dataGenerator.Generate(-3);
+                var settings = services.GetRequiredService<IOptions<DataGenerationSettings>>();
+                dataGenerator.Generate(settings.Value.SimulateForDays);
             }
 
-                // Configure the HTTP request pipeline.
+            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();

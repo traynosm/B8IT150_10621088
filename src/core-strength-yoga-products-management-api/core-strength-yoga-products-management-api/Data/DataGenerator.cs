@@ -4,6 +4,7 @@ using core_strength_yoga_products_api.Extensions;
 using core_strength_yoga_products_api.Interfaces;
 using core_strength_yoga_products_api.Model;
 using core_strength_yoga_products_api.Models;
+using Microsoft.Extensions.Options;
 
 namespace core_strength_yoga_products_api.Data
 {
@@ -13,15 +14,17 @@ namespace core_strength_yoga_products_api.Data
         private IEnumerable<Product> _products;
         private IEnumerable<Customer> _customers;
         private readonly ProductsController _productsController;
+        private readonly IOptions<DataGenerationSettings> _settings;
         private Random _random = new Random();
 
         public DataGenerator(CoreStrengthYogaProductsApiDbContext context,
-            ProductsController productsController)
+            ProductsController productsController, IOptions<DataGenerationSettings> settings)
         {
             _context = context;
             _products = GetProducts();
             _customers = GetCustomers();
             _productsController = productsController;
+            _settings = settings;
         }
 
         public async Task Generate(int numberOfDays)
@@ -33,7 +36,7 @@ namespace core_strength_yoga_products_api.Data
                 var dateTime = DateTime.Now.AddDays(i);
                 await UpdateStockLevels(dateTime);
 
-                var ordersToday = _random.Next(0, 10);
+                var ordersToday = _random.Next(0, _settings.Value.SimulateOrdersPerDay);
 
                 for (int j = 0; j < ordersToday; j++)
                 {
@@ -49,7 +52,9 @@ namespace core_strength_yoga_products_api.Data
                     var productAttribute = product.ProductAttributes
                         .FirstOrDefault(p => p.Id == productAttrIds[productAttrId])!;
 
-                    var qty = _random.Next(1, productAttribute.StockLevel);
+                    var qty = productAttribute.StockLevel >= _settings.Value.SimulateQtyMaximumPerOrder ?
+                        _random.Next(1, _settings.Value.SimulateQtyMaximumPerOrder) : 
+                        _random.Next(1, productAttribute.StockLevel);
 
                     var totalCost = BasketItem.CalculateTotalItemCost(
                                     product.FullPrice,
@@ -110,7 +115,7 @@ namespace core_strength_yoga_products_api.Data
             {
                 foreach (var attr in product.ProductAttributes)
                 {
-                    if (attr.StockLevel <= 50)
+                    if (attr.StockLevel <= _settings.Value.ReplenishWhenReachesBelow)
                     {
                         var stockAudit = new StockAudit()
                         {
@@ -119,13 +124,15 @@ namespace core_strength_yoga_products_api.Data
                             ProductAttributeId = attr.Id,
                             Username = "ProductExecutive",
                             OldStockLevel = attr.StockLevel,
-                            NewStockLevel = 100,
-                            StockLevelChange = StockAudit.CalculateStockChange(100, attr.StockLevel),
+                            NewStockLevel = _settings.Value.ReplenishTo,
+                            StockLevelChange = StockAudit.CalculateStockChange(
+                                _settings.Value.ReplenishTo, attr.StockLevel),
                         };
                         _context.StockAudits.Add(stockAudit);
                         await _context.SaveChangesAsync();
+
+                        attr.StockLevel = _settings.Value.ReplenishTo;
                     }
-                    attr.StockLevel = 100;
                 }
                 await _productsController.Put(product);
             }
@@ -144,7 +151,5 @@ namespace core_strength_yoga_products_api.Data
                 .IncludeAllRelated()
                 .ToList();
         }
-
     }
-
 }
