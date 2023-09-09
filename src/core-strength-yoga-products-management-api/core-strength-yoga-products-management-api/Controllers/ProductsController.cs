@@ -243,9 +243,10 @@ namespace core_strength_yoga_products_api.Controllers
                 
                 var savedProductAttribute = savedProduct.ProductAttributes.SingleOrDefault(
                     pa => pa.Id == productAttributeToUpdate.Id);
-                if (productAttributeToUpdate.StockLevel != savedProductAttribute.StockLevel)
+
+                if (savedProductAttribute != null && productAttributeToUpdate.StockLevel != savedProductAttribute?.StockLevel)
                 {
-                    var oldStockLevel = savedProductAttribute.StockLevel;
+                    var oldStockLevel = savedProductAttribute!.StockLevel;
                     var newStockLevel = productAttributeToUpdate.StockLevel;
 
                     var stockAudit = new StockAudit()
@@ -260,6 +261,7 @@ namespace core_strength_yoga_products_api.Controllers
                     };
                     await _stockAuditService.SaveStockAudit(stockAudit);
                 }
+
                 if (savedProductAttribute != null)
                 {
                     _context.Entry(savedProductAttribute).CurrentValues.SetValues(productAttributeToUpdate);
