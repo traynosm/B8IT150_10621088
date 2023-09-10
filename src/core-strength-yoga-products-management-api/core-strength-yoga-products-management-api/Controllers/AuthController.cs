@@ -32,8 +32,8 @@ namespace core_strength_yoga_products_api.Controllers
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
-        }     
-       
+        } 
+        
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody] User model)

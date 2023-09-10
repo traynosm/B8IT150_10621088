@@ -105,7 +105,8 @@ namespace core_strength_yoga_products_api
                     }
                 });
             });
-            
+
+            builder.Services.AddHealthChecks();
 
             var connectionString = builder.Configuration
                 .GetConnectionString("CoreStrengthYogaProductsApi") ??
@@ -147,6 +148,7 @@ namespace core_strength_yoga_products_api
             }
             
             app.UseRouting();
+            app.UseHealthChecks("/health");
 
             app.UseAuthentication();
             app.UseAuthorization();
