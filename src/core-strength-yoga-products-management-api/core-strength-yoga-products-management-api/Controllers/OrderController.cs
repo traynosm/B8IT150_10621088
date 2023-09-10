@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Collections;
 
 namespace core_strength_yoga_products_api.Controllers
 {
@@ -19,6 +20,20 @@ namespace core_strength_yoga_products_api.Controllers
         {
             _logger = logger;
             _context = context;
+        }
+
+        [HttpGet()]
+        public ActionResult<IEnumerable<Order>> Get() 
+        {
+            var orders = _context.Orders
+                .Include(p => p.Items).ToList();
+
+            if (orders == null)
+            {
+                return NotFound();
+            }
+
+            return orders;
         }
 
         [Authorize]

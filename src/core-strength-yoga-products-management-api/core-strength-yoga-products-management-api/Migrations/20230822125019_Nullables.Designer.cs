@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using core_strength_yoga_products_api.Data.Contexts;
 
@@ -10,9 +11,11 @@ using core_strength_yoga_products_api.Data.Contexts;
 namespace core_strength_yoga_products_api.Migrations
 {
     [DbContext(typeof(CoreStrengthYogaProductsApiDbContext))]
-    partial class CoreStrengthYogaProductsApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230822125019_Nullables")]
+    partial class Nullables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
@@ -252,42 +255,6 @@ namespace core_strength_yoga_products_api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Images");
-                });
-
-            modelBuilder.Entity("core_strength_yoga_products_api.Model.StockAudit", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("ChangedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("NewStockLevel")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("OldStockLevel")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ProductAttributeId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("StockLevelChange")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("StockAudits");
                 });
 
             modelBuilder.Entity("core_strength_yoga_products_api.Models.AddressDetail", b =>

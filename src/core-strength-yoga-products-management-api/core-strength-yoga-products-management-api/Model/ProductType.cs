@@ -8,9 +8,9 @@ namespace core_strength_yoga_products_api.Models
         [Key]
         public int Id { get; set; }
         public string ProductTypeName { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public int ImageId { get; set; }
-        public virtual Image Image { get; set; }
+        public virtual Image? Image { get; set; }
 
         public ProductType() { }    
 

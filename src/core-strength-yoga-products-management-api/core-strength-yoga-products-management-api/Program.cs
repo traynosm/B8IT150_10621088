@@ -7,7 +7,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
-
+using core_strength_yoga_products_api.Interfaces;
+using core_strength_yoga_products_api.Services;
+using core_strength_yoga_products_api.Controllers;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace core_strength_yoga_products_api
 {
@@ -33,6 +37,7 @@ namespace core_strength_yoga_products_api
                     options.Password.RequireNonAlphanumeric = false;
                     options.Password.RequireUppercase = false;
                 })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<CoreStrengthYogaProductsApiDbContext>()
                 .AddDefaultTokenProviders();
             
@@ -100,7 +105,8 @@ namespace core_strength_yoga_products_api
                     }
                 });
             });
-            
+
+            builder.Services.AddHealthChecks();
 
             var connectionString = builder.Configuration
                 .GetConnectionString("CoreStrengthYogaProductsApi") ??
@@ -108,8 +114,13 @@ namespace core_strength_yoga_products_api
 
             builder.Services.AddDbContext<CoreStrengthYogaProductsApiDbContext>(options =>
                 options.UseSqlite(connectionString));
-            
-           
+
+            builder.Services.AddTransient<IStockAuditService, StockAuditService>();
+            builder.Services.AddScoped<IDataGenerator, DataGenerator>();
+            builder.Services.AddScoped<ProductsController>();
+
+            builder.Services.Configure<DataGenerationSettings>(o =>
+                builder.Configuration.GetSection("DataGenerationSettings").Bind(o));
 
             var app = builder.Build();
 
@@ -121,6 +132,14 @@ namespace core_strength_yoga_products_api
                 SeedData.Initialize(services);
             }
 
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var dataGenerator = services.GetRequiredService<IDataGenerator>();
+                var settings = services.GetRequiredService<IOptions<DataGenerationSettings>>();
+                dataGenerator.Generate(settings.Value.SimulateForDays);
+            }
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -129,6 +148,7 @@ namespace core_strength_yoga_products_api
             }
             
             app.UseRouting();
+            app.UseHealthChecks("/health");
 
             app.UseAuthentication();
             app.UseAuthorization();
